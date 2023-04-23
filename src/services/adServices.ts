@@ -3,9 +3,9 @@ import { client, sequelize } from ".."
 import { GuildBasedChannel, GuildTextBasedChannel } from "discord.js";
 
 export const createAd = async (body: {name: string, delay: number, msg: string, channelId: string}): Promise<any> => {
+    const t = await sequelize.transaction({autocommit: false})
     try{
         const ads_model = sequelize.model('ads');
-        const t = await sequelize.transaction({autocommit: false})
 
         const [model, created] = await ads_model.findOrCreate({
             where: {
@@ -30,6 +30,7 @@ export const createAd = async (body: {name: string, delay: number, msg: string, 
             throw new Error ('ad already exists!')
         }
     }catch(err: any){
+        await t.rollback()
         console.log("Err at services/adServices/createAd()");
         console.log(err);
         throw new Error(err.message) 
@@ -37,9 +38,10 @@ export const createAd = async (body: {name: string, delay: number, msg: string, 
 }
 
 export const deleteAd = async (body: {name: string}) => {
+    const t = await sequelize.transaction({autocommit: false});
+
     try{
         const ads_model = sequelize.model('ads');
-        const t = await sequelize.transaction({autocommit: false});
 
         const model = await ads_model.findOne({
             where: {...body},
@@ -50,8 +52,16 @@ export const deleteAd = async (body: {name: string}) => {
 
         const res = await model.destroy({transaction: t});
 
+        try{
+            await t.commit()
+        }catch(err: any){
+            await t.rollback()
+            throw new Error('an error while trying to commit this to the database')
+        }
+
         return 'success';
     }catch(err: any){
+        await t.rollback()
         console.log("Err at services/adServices/deleteAd()");
         console.log(err);
         throw new Error(err.message)

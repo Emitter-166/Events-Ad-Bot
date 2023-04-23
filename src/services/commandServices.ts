@@ -17,7 +17,7 @@ export const events_ad = async (msg: Message) => {
             const lastSentAtText = lastSentAt+"";
             const time = lastSentAtText.slice(0, lastSentAtText.length -3);
     
-            description += `**${i}. ${name} last: <t:${time}:R> every: ${delay/60_000} min on: <#${channelId}>** \n`
+            description += `**${i}. ${name} <t:${time}:R>** \n`
         }
     
         embed.setDescription(description);
