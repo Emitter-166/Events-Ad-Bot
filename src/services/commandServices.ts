@@ -8,7 +8,29 @@ export const events_ad = async (msg: Message) => {
         let description = '';
     
         const ads_all = await ads_model.findAll();
-    
+        
+
+        const rows = new ActionRowBuilder<ButtonBuilder>()
+        .addComponents(
+            new ButtonBuilder()
+                .setLabel('create')
+                .setCustomId('events-ad-button-create')
+                .setStyle(ButtonStyle.Success),
+
+            new ButtonBuilder()
+                .setLabel('delete')
+                .setCustomId('events-ad-button-delete')
+                .setStyle(ButtonStyle.Danger)
+        )
+
+        if(ads_all.length === 0){
+            description = '# no ads running'; 
+            embed.setDescription(description);
+            await msg.reply({embeds: [embed], components: [rows], allowedMentions: {repliedUser: false}});
+
+            return;
+        }  
+
         let i = 0;
         for(const ad of ads_all){
             i++;
@@ -21,21 +43,8 @@ export const events_ad = async (msg: Message) => {
         }
     
         embed.setDescription(description);
-    
-        const rows = new ActionRowBuilder<ButtonBuilder>()
-            .addComponents(
-                new ButtonBuilder()
-                    .setLabel('create')
-                    .setCustomId('events-ad-button-create')
-                    .setStyle(ButtonStyle.Success),
-    
-                new ButtonBuilder()
-                    .setLabel('delete')
-                    .setCustomId('events-ad-button-delete')
-                    .setStyle(ButtonStyle.Danger)
-            )
-    
         await msg.reply({embeds: [embed], components: [rows], allowedMentions: {repliedUser: false}});
+        
     }catch(err: any){
         console.log("Err on services/commandServices/events_ad()");
         console.log(err);
