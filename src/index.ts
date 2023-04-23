@@ -3,6 +3,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { Sequelize } from 'sequelize';
 import { availableAds, createAd, deleteAd, scanAds, sendAd } from './services/adServices';
+import messageCreate from './events/messageCreate';
+import interactionCreate from './events/interactionCreate';
 
 require('dotenv').config({
     path: path.join(__dirname, ".env")
@@ -42,8 +44,11 @@ client.once('ready', async (client) => {
     
     //starting the scanner
     scanAds();
-})
 
+    //event listeners 
+    messageCreate(client);
+    interactionCreate(client);
+})
 
 
 
