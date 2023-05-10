@@ -97,7 +97,7 @@ export const sendAd = async (ad: Model<any, any>) => {
         const msg_arr: string [] = msg.split('::');
 
         const raw_message = msg_arr[Math.floor(Math.random() * msg_arr.length)];
-        let img_links = raw_message.split(" ").filter(word => word.startsWith('https://') && (word.endsWith('.png') || word.endsWith('.jpg')) )
+        let img_links = raw_message.split("\n").filter(word => word.startsWith('https://') && (word.endsWith('.png') || word.endsWith('.jpg') || word.endsWith('.gif')) )
 
         let content = raw_message;
         for (const link of img_links) {
