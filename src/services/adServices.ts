@@ -94,7 +94,7 @@ export const sendAd = async (ad: Model<any, any>) => {
 
         const channel = await client.channels.fetch(channelId) as GuildTextBasedChannel;
 
-        const msg_arr: string [] = msg.split(':');
+        const msg_arr: string [] = msg.split('::');
 
         const raw_message = msg_arr[Math.floor(Math.random() * msg_arr.length)];
         let img_links = raw_message.split(" ").filter(word => word.startsWith('https://') && (word.endsWith('.png') || word.endsWith('.jpg')) )
