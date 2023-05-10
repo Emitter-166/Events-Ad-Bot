@@ -1,6 +1,6 @@
-import { Model, Sequelize } from "sequelize";
+import { Model, } from "sequelize";
 import { client, sequelize } from ".."
-import { GuildBasedChannel, GuildTextBasedChannel } from "discord.js";
+import { AttachmentBuilder, GuildTextBasedChannel } from "discord.js";
 
 export const createAd = async (body: {name: string, delay: number, msg: string, channelId: string}): Promise<any> => {
     const t = await sequelize.transaction({autocommit: false})
@@ -93,7 +93,33 @@ export const sendAd = async (ad: Model<any, any>) => {
         if(!client.isReady()) throw new Error('client hasn\'t started yet!');
 
         const channel = await client.channels.fetch(channelId) as GuildTextBasedChannel;
-        await channel.send(msg);
+
+        const msg_arr: string [] = msg.split(':');
+
+        const raw_message = msg_arr[Math.floor(Math.random() * msg_arr.length)];
+        let img_links = raw_message.split(" ").filter(word => word.startsWith('https://') && (word.endsWith('.png') || word.endsWith('.jpg')) )
+
+        let content = raw_message;
+        for (const link of img_links) {
+            content = content.replace(link, '');
+        }
+
+        let attachments: AttachmentBuilder[] = [];
+
+        for (const link of img_links) {
+            const response = await fetch(link);
+            const arrayBuffer = await response.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+            
+            const attachment = new AttachmentBuilder(buffer);
+            attachments.push(attachment);
+        }
+
+        await channel.send({
+            content,
+            files: attachments
+        });
+
 
         return (await ad.update({
             lastSentAt: Date.now()
